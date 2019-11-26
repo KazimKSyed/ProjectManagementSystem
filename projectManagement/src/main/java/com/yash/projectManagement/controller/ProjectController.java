@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -23,6 +24,7 @@ import com.yash.projectManagement.serviceimpl.ProjectServiceImpl;
 
 @RestController
 @RequestMapping("/api/project")
+@CrossOrigin(origins = "*")
 public class ProjectController {
 	@Autowired
 	ProjectServiceImpl projectService;
@@ -31,11 +33,11 @@ public class ProjectController {
 
 	@PostMapping(value = "/")
 	public ResponseEntity<?> addProject(@RequestBody Project project, UriComponentsBuilder ucBuilder) {
-		logger.info("Creating User : {}", project);
+		logger.info("Creating Project : {}", project);
 
 		if (projectService.isUserExist(project)) {
-			logger.error("Unable to create. A User with name {} already exist", project.getName());
-			return new ResponseEntity("Unable to create. A User with name " + project.getName() + " already exist.",
+			logger.error("Unable to create a project with name {} already exist", project.getName());
+			return new ResponseEntity("Unable to create. A Project with name " + project.getName() + " already exist.",
 					HttpStatus.CONFLICT);
 		}
 		projectService.add(project);
@@ -48,10 +50,10 @@ public class ProjectController {
 	@GetMapping(value = "/{id}")
 	public ResponseEntity<?> getProject(@PathVariable int id) {
 
-		logger.info("Fetching User with id {}", id);
+		logger.info("Fetching Project with id {}", id);
 		Project project = projectService.get(id);
 		if (project == null) {
-			logger.error("User with id {} not found.", id);
+			logger.error("Project with id {} not found.", id);
 			return new ResponseEntity("User with id " + id + " not found", HttpStatus.NOT_FOUND);
 		}
 		return new ResponseEntity<Project>(project, HttpStatus.OK);
@@ -70,14 +72,14 @@ public class ProjectController {
 
 	@PutMapping(value = "/{id}")
 	public ResponseEntity<?> updateProject(@RequestBody Project project, @PathVariable int id) {
-		logger.info("Updating User with id {}", id);
+		logger.info("Updating Project with id {}", id);
 
 		Project currentProject = projectService.get(id);
 
 		if (currentProject == null) {
-			logger.error("Unable to update. User with id {} not found.", id);
+			logger.error("Unable to update. Project with id {} not found.", id);
 
-			return new ResponseEntity("Unable to upate. User with id " + id + " not found.", HttpStatus.NOT_FOUND);
+			return new ResponseEntity("Unable to upate. Project with id " + id + " not found.", HttpStatus.NOT_FOUND);
 		}
 		currentProject.setId(id);
 		currentProject.setName(project.getName());
@@ -91,13 +93,13 @@ public class ProjectController {
 
 	@DeleteMapping(value = "/{id}")
 	public ResponseEntity<?> deleteProject(@PathVariable int id) {
-		logger.info("Fetching & Deleting User with id {}", id);
+		logger.info("Fetching & Deleting Project with id {}", id);
 
 		Project project = projectService.get(id);
 
 		if (project == null) {
-			logger.error("Unable to delete. User with id {} not found.", id);
-			return new ResponseEntity("Unable to delete. User with id " + id + " not found.", HttpStatus.NOT_FOUND);
+			logger.error("Unable to delete. Project with id {} not found.", id);
+			return new ResponseEntity("Unable to delete. Project with id " + id + " not found.", HttpStatus.NOT_FOUND);
 		}
 		projectService.delete(id);
 		return new ResponseEntity<Project>(HttpStatus.NO_CONTENT);
